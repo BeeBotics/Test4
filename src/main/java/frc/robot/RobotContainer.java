@@ -47,7 +47,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    DogLog.setOptions(new DogLogOptions().withCaptureDs(true));
+    DogLog.setOptions(new DogLogOptions().withCaptureDs(true).withCaptureNt(true));
     DogLog.setPdh(new PowerDistribution());
     // Configure default commands
     m_robotDrive.setDefaultCommand(

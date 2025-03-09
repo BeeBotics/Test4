@@ -84,6 +84,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearRight.getState()
       });
 
+      DogLog.log("Debug/Pose",getPose());
   }
 
   /**
