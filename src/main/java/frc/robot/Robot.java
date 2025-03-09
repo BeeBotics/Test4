@@ -4,9 +4,22 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
+import frc.robot.subsystems.Arm;
+import frc.robot.elevator;
+
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import com.revrobotics.spark.SparkMax;
+
+import dev.doglog.DogLog;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,6 +31,15 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private elevator elevator;
+  private Arm arm;
+
+  private Constants constants;
+  private XboxController m_Controller;
+  private XboxController m_DriveController;
+  private SparkMax climbMotor;
+  private SparkMax algaeMotor;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -28,6 +50,16 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    elevator = new elevator();
+    arm = new Arm();
+    constants = new Constants();
+
+    climbMotor = new SparkMax(20, MotorType.kBrushless);
+    algaeMotor = new SparkMax(12, MotorType.kBrushless);
+
+    m_Controller = new XboxController(1);
+    m_DriveController = new XboxController(0);
+
   }
 
   /**
@@ -44,11 +76,24 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+       CommandScheduler.getInstance().run();
+
+    DogLog.log("Debug/SwerveState", new SwerveModuleState());
+    DogLog.log(
+        "Debug/SwerveStates",
+        new SwerveModuleState[] {
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState(),
+          new SwerveModuleState()
+        });
+    DogLog.log("Debug/Position", elevator.getHeight());
+    DogLog.log("Debug/Json", "{\"test\": \"json\"}", "json");
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {DogLog.decreaseFault("ExampleFault");}
 
   @Override
   public void disabledPeriodic() {}
@@ -88,7 +133,60 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+     SmartDashboard.putNumber("Position", elevator.getHeight());
+     SmartDashboard.putNumber("Rotation", arm.getRotation());
+
+    if (m_Controller.getXButton() == true) {     // L4 
+      elevator.setPosition(-0.95); 
+      arm.setRotation(-0.021);
+    }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (m_Controller.getYButton() == true) {     // L3 
+      elevator.setPosition(-0.1); 
+      arm.setRotation(-0.021);
+    }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (m_Controller.getBButton() == true) {     // L2 
+      elevator.setPosition(0); 
+      arm.setRotation(-0.023);
+    }
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+if (m_Controller.getAButton() == true) {     // Yoink
+  elevator.setPosition(0.5); 
+ 
+  arm.setRotation(0);
+}
+if (m_Controller.getRightBumperButton() == true) {     // Reset
+  arm.setRotation(0.01);
+  arm.resetRotation();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+if (m_Controller.getXButton() == false && m_Controller.getYButton() == false && m_Controller.getAButton() == false && m_Controller.getBButton() == false && m_Controller.getRightBumperButton() == false) {
+  arm.setRotation(0);
+  elevator.setPosition(0); 
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+
+//if (m_Controller.getRightBumperButton() == true) {
+   //   algaeMotor.set(-0.3);
+   // }
+  //  else if (m_Controller.getRightBumperButtonReleased() == true) {
+  //    algaeMotor.set(0);
+//}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+if (m_Controller.getLeftBumperButton() == true) {
+  algaeMotor.set(0.5);
+}
+else if (m_Controller.getLeftBumperButtonReleased() == true) {
+  algaeMotor.set(0);
+}
+
+    climbMotor.set(-m_Controller.getLeftY()/2);
+
+}
+
 
   @Override
   public void testInit() {
@@ -98,5 +196,8 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    SmartDashboard.putNumber("Position", elevator.getHeight());
+    SmartDashboard.putNumber("Rotation", arm.getRotation());
+  }
 }
