@@ -76,18 +76,12 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-       CommandScheduler.getInstance().run();
-
+      
+    SmartDashboard.putNumber("Position", elevator.getHeight());
+    SmartDashboard.putNumber("Rotation", arm.getRotation());
     DogLog.log("Debug/SwerveState", new SwerveModuleState());
-    DogLog.log(
-        "Debug/SwerveStates",
-        new SwerveModuleState[] {
-          new SwerveModuleState(),
-          new SwerveModuleState(),
-          new SwerveModuleState(),
-          new SwerveModuleState()
-        });
     DogLog.log("Debug/Position", elevator.getHeight());
+    DogLog.log("Debug/Rotation", arm.getRotation());
     DogLog.log("Debug/Json", "{\"test\": \"json\"}", "json");
   }
 
@@ -134,8 +128,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-     SmartDashboard.putNumber("Position", elevator.getHeight());
-     SmartDashboard.putNumber("Rotation", arm.getRotation());
+    
 
     if (m_Controller.getXButton() == true) {     // L4 
       elevator.setPosition(-0.95); 
